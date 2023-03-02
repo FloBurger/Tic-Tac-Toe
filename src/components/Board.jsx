@@ -1,52 +1,82 @@
 import { useEffect, useState } from "react";
 import Square from "./Square";
 
-export default function Board() {
+function Board() {
   const [grid, setGrid] = useState([]);
   const [nextValueX, setnextValueX] = useState(true);
+  const [gridSize, setGridSize] = useState(4);
 
   useEffect(() => {
-    fillGrid(5);
+    initializeGrid(gridSize);
   }, []);
 
-  function createGrid(size) {
-    var result = [];
+  function initializeGrid(size) {
+    var initGrid = [];
     for (var i = 0; i < size; i++) {
-      result.push(new Array(size).fill(null));
+      initGrid.push(new Array(size).fill(null));
     }
-    console.log(result);
-    return result;
-  }
-
-  function fillGrid(size) {
-    let initGrid = createGrid(5);
-    let counter = 1;
-    for (let i = 0; i < size; ++i) {
-      for (let j = 0; j < size; ++j) {
-        let cellContent = {
-          index: counter,
-          value: null,
-          magic: null,
-        };
-        initGrid[i][j] = cellContent;
-        ++counter;
-      }
-    }
+    console.log(initGrid);
     setGrid(initGrid);
   }
+
   function handleClick(i, j) {
     const nextGrid = grid.slice();
-    //Check if value already set
-    if (nextGrid[i][j].value) {
+    let value = nextValueX ? "X" : "O";
+    if (nextGrid[i][j]) {
       return;
     }
+    //Check if value already set
     if (nextValueX) {
-      nextGrid[i][j].value = "X";
+      nextGrid[i][j] = "X";
     } else {
-      nextGrid[i][j].value = "O";
+      nextGrid[i][j] = "O";
+    }
+    if (checkForWinner(nextGrid, i, j, value)) {
+      console.log("Winner: " + value);
+      setGrid(nextGrid);
+      return;
     }
     setnextValueX(!nextValueX);
     setGrid(nextGrid);
+  }
+
+  function checkForWinner(grid, row, column, value) {
+    if (hasSameValue(grid[row])) {
+      return value;
+    }
+    //column
+    let currentColumn = [];
+    for (let i = 0; i < grid.length; i++) {
+      currentColumn.push(grid[i][column]);
+    }
+    if (hasSameValue(currentColumn)) {
+      return value;
+    }
+    // diagonal
+    // need to check if value is on diagonal
+    let firstDiagonale = [];
+    let secondDiagonale = [];
+    let k = grid.length - 1;
+    for (let i = 0; i < grid.length; i++) {
+      firstDiagonale.push(grid[i][i]);
+      secondDiagonale.push(grid[i][k]);
+      k -= 1;
+    }
+    if (hasSameValue(firstDiagonale)) {
+      return value;
+    }
+    if (hasSameValue(secondDiagonale)) {
+      return value;
+    }
+    return null;
+  }
+
+  function hasSameValue(arr) {
+    if (arr.every((val, i, arr) => val === arr[0] && val !== null)) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   return (
@@ -55,7 +85,7 @@ export default function Board() {
         <div className="board-row">
           {rowItem.map((columnItem, indexJ) => (
             <Square
-              value={columnItem.value}
+              value={columnItem}
               onSquareClick={() => handleClick(indexI, indexJ)}
             />
           ))}
@@ -64,3 +94,5 @@ export default function Board() {
     </>
   );
 }
+
+export default Board;
