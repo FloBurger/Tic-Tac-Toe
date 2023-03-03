@@ -5,7 +5,6 @@ function Board() {
   const [grid, setGrid] = useState([]);
   const [nextValueX, setnextValueX] = useState(true);
   const [gridSize, setGridSize] = useState(3);
-  const [gameStatus, setGameStatus] = useState("X");
   const [history, setHistory] = useState([]);
   const [currentMove, setCurrentMove] = useState(0);
   const [hasWinner, setHasWinner] = useState(false);
@@ -26,36 +25,34 @@ function Board() {
     setGrid(initGrid);
   }
 
-  function setNext(i, j, value) {
+  // Pushes the current Move to the History
+  function setNextInHistory(i, j, value) {
     const nextHistory = [
       ...history.slice(0, currentMove),
       { value: value, row: i, column: j },
     ];
-    console.log(nextHistory);
     setHistory(nextHistory);
   }
 
-  function handleClick(i, j) {
+  function handleSquareClick(i, j) {
     const nextGrid = grid.slice();
     //Check if value already set
     if (nextGrid[i][j] || hasWinner) {
       return;
     }
     setCurrentMove(currentMove + 1);
+    console.log(gridSize);
     console.log(currentMove);
     let value = nextValueX ? "X" : "O";
     if (nextValueX) {
       nextGrid[i][j] = value;
-      //setGameStatus(value);
     } else {
       nextGrid[i][j] = value;
-      ///setGameStatus(value);
     }
-    setNext(i, j, value);
+    setNextInHistory(i, j, value);
     if (checkForWinner(nextGrid, i, j, value)) {
       console.log("Winner: " + value);
       setHasWinner(true);
-      //setGameStatus("Winner: " + value);
       setGrid(nextGrid);
     }
     setnextValueX(!nextValueX);
@@ -63,6 +60,7 @@ function Board() {
   }
 
   function checkForWinner(grid, row, column, value) {
+    // row
     if (hasSameValue(grid[row])) {
       return value;
     }
@@ -75,7 +73,6 @@ function Board() {
       return value;
     }
     // diagonal
-    // need to check if value is on diagonal
     let firstDiagonale = [];
     let secondDiagonale = [];
     let k = grid.length - 1;
@@ -93,6 +90,7 @@ function Board() {
     return null;
   }
 
+  // Checks if every element in the Array is the same and not null
   function hasSameValue(arr) {
     if (arr.every((val, i, arr) => val === arr[0] && val !== null)) {
       return true;
@@ -104,13 +102,12 @@ function Board() {
   function reset() {
     initializeGrid(gridSize);
     setnextValueX(true);
-    setGameStatus("X");
     setCurrentMove(0);
     setHasWinner(false);
   }
 
   function undoMove() {
-    if (currentMove <= 0) {
+    if (currentMove <= 0 || hasWinner) {
       return;
     }
     const nextGrid = grid.slice();
@@ -119,7 +116,6 @@ function Board() {
     setGrid(nextGrid);
     setCurrentMove(currentMove - 1);
     setnextValueX(!nextValueX);
-    setGameStatus(nextValueX ? "X" : "O");
   }
 
   function redoMove() {
@@ -132,7 +128,6 @@ function Board() {
     setGrid(nextGrid);
     setCurrentMove(currentMove + 1);
     setnextValueX(!nextValueX);
-    setGameStatus(nextValueX ? "X" : "O");
   }
 
   function changeGridSize(size) {
@@ -143,6 +138,8 @@ function Board() {
   let gamesStatus;
   if (hasWinner) {
     gamesStatus = "Winner: " + (nextValueX ? "O" : "X");
+  } else if (currentMove === gridSize ** 2) {
+    gamesStatus = "Tie";
   } else {
     gamesStatus = "Next player: " + (nextValueX ? "X" : "O");
   }
@@ -164,14 +161,20 @@ function Board() {
           {rowItem.map((columnItem, indexJ) => (
             <Square
               value={columnItem}
-              onSquareClick={() => handleClick(indexI, indexJ)}
+              onSquareClick={() => handleSquareClick(indexI, indexJ)}
             />
           ))}
         </div>
       ))}
-      <button onClick={reset}>Reset</button>
-      <button onClick={undoMove}>undo</button>
-      <button onClick={redoMove}>redo</button>
+      <button class="button-1" role="button" onClick={reset}>
+        Reset
+      </button>
+      <button class="button-1" role="button" onClick={undoMove}>
+        undo
+      </button>
+      <button class="button-1" role="button" onClick={redoMove}>
+        redo
+      </button>
     </>
   );
 }
