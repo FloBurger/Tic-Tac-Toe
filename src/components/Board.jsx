@@ -41,8 +41,6 @@ function Board() {
       return;
     }
     setCurrentMove(currentMove + 1);
-    console.log(gridSize);
-    console.log(currentMove);
     let value = nextValueX ? "X" : "O";
     if (nextValueX) {
       nextGrid[i][j] = value;
@@ -51,7 +49,6 @@ function Board() {
     }
     setNextInHistory(i, j, value);
     if (checkForWinner(nextGrid, i, j, value)) {
-      console.log("Winner: " + value);
       setHasWinner(true);
       setGrid(nextGrid);
     }
@@ -166,14 +163,14 @@ function Board() {
           ))}
         </div>
       ))}
-      <button class="button-1" role="button" onClick={reset}>
+      <button className="button-1" role="button" onClick={reset}>
         Reset
       </button>
-      <button class="button-1" role="button" onClick={undoMove}>
-        undo
+      <button className="button-1" role="button" onClick={undoMove}>
+        Undo
       </button>
-      <button class="button-1" role="button" onClick={redoMove}>
-        redo
+      <button className="button-1" role="button" onClick={redoMove}>
+        Redo
       </button>
     </>
   );

@@ -10,8 +10,6 @@
     "host": "vite --host"
   },
   "dependencies": {
-    "itertool-js": "^1.1.0",
-    "js-combinatorics": "^2.1.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
